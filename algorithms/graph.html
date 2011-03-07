@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script language="javascript" src="jquery-1.5.1.js"></script>
+	<script language="javascript" src="graph.js"></script>
+	<script language="javascript">
+
+$(document).ready(function(){
+
+	
+
+	$('#draw').click(function()
+	{
+		initgraph()
+	})
+
+	initgraph = function()
+	{
+		textgraph = $('#graphml')
+		
+		graph = parsegraph(textgraph.val())
+	}
+	initgraph()
+	
+	
+	
+ 	setInterval(draw, 1000);
+	
+	ctx = $('#canvas')[0].getContext("2d");
+	
+	function draw() {
+		ctx.clearRect(0, 0, ctx.width, ctx.height);
+		graph.draw(ctx)
+
+	}	
+
+	function parsegraph(text)
+	{
+		var graph = new Graph()
+		lines = text.split("\n")
+		for(i in lines)
+		{
+			var line = lines[i].trim()
+			var edges = line.split(" ")
+			if(edges.length == 3)
+			{
+				var n1 = graph.getNode(edges[0].trim())
+				var n2 = graph.getNode(edges[2].trim())
+				graph.addEdge(n1,n2)
+			}
+				
+		}
+		return graph
+	}
+
+
+})	
+  </script>
+</head>
+<body>
+
+
+<canvas id="canvas" width="300" height="300"></canvas>
+
+<form>
+	<textarea cols="50" rows="4" id="graphml">
+a -> b
+b -> c
+c -> a </textarea>
+
+	
+</form>
+
+<button id="draw">draw</button> 
+
+</body>
+</html>

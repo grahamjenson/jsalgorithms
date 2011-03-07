@@ -1,0 +1,20 @@
+function Graph()
+{
+    this.nodes = [];
+    this.edges = [];
+}
+
+function Node()
+{
+    this.type = "";
+    this.name = "";
+}
+
+function Edge()
+{
+    this.weight = 1;
+}
+
+
+
+       
