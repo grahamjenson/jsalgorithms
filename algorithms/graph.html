@@ -16,15 +16,21 @@ $(document).ready(function(){
 	
 	$('#random').click(function()
 	{
-		textgraph = $('#graphml')[0]
-		textgraph.value = ""		
-		for(i = 0; i < 10; i++)
-		{
-			textgraph.value += Math.floor(Math.random()*10) + " - " + Math.floor(Math.random()*10) + "\n"
-		}
-		
-		initgraph()
+		randomgraph()
+		initgraph()		
 	})
+	
+	randomgraph = function()
+	{
+		textgraph = $('#graphml')[0]
+		textgraph.value = ""
+		var nnodes = 20
+		var nedges = 25	
+		for(i = 0; i < nedges; i++)
+		{
+			textgraph.value += Math.floor(Math.random()*nnodes) + " - " + Math.floor(Math.random()*nnodes) + "\n"
+		}
+	}
 
 	initgraph = function()
 	{
@@ -32,6 +38,7 @@ $(document).ready(function(){
 		graph = parsegraph(textgraph.value)
 		draw(ctx)
 	}
+	randomgraph()
 	initgraph()
 	
 	
@@ -72,7 +79,7 @@ $(document).ready(function(){
 <body>
 
 
-<canvas id="canvas" width="300" height="300"></canvas>
+<canvas id="canvas" width="600" height="600"></canvas>
 
 <form>
 	<textarea cols="50" rows="4" id="graphml">

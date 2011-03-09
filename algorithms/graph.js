@@ -1,11 +1,3 @@
-Object.size = function(obj) {
-    var size = 0, key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
-    }
-    return size;
-};
-
 function Graph()
 {
     this.V = [];
@@ -71,7 +63,11 @@ function Graph()
 		//calculate new positions
 		if(this.first) 
 		{
+			//clean off what was there
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			//init the layout
 			this.layout.init(this,ctx.canvas.width,ctx.canvas.height)
+			//Never again
 			this.first = false
 		}
 		this.layout.run(this,ctx.canvas.width,ctx.canvas.height)
@@ -89,23 +85,39 @@ function Graph()
 function Node(n)
 {
 	this.nodename = n
+
+	//top left corner
 	this.x = 0
 	this.y = 0
 
 	//x to x + size, and y + size 
-	this.size = 10
+	this.size = 20
+
+	//util function for center
+	this.centerx = function()
+	{
+		return this.x+this.size/2
+	}
+
+	this.centery = function()
+	{
+		return this.y+this.size/2
+	}
 
 	this.draw = function(canvas)
 	{	
+		//Clean, a little outside too, just to be sure
 		
-		canvas.strokeStyle = "#000000";
-		canvas.fillStyle = "#FFFF00";
+
+		canvas.strokeStyle = "#005580";
+		canvas.fillStyle = "#7BC1DB";
 		canvas.beginPath();
 		//x y = top left corner, size == radius, 0 is start angle, 2pi is end angle, true is anticlockwise
-  		canvas.arc(this.x, this.y, this.size, 0, Math.PI*2, true); 
-  		canvas.closePath();
+  		canvas.arc(this.centerx(), this.centery(), this.size/2, 0, Math.PI*2, true); 
+		canvas.fill();  		
+		canvas.closePath();
 		canvas.stroke();
-		canvas.fill();
+		
 	}
 }
 
@@ -117,9 +129,12 @@ function Edge(n1,n2,weight)
 
 	this.draw = function(canvas)
 	{
-		canvas.moveTo(this.from.x,this.from.y);
-  		canvas.lineTo(this.to.x,this.to.y);
+
+		canvas.beginPath();
+		canvas.moveTo(this.from.centerx(),this.from.centery());
+  		canvas.lineTo(this.to.centerx(),this.to.centery());
   		canvas.stroke();
+		canvas.closePath();
 	}
 }
 
@@ -127,8 +142,8 @@ function Edge(n1,n2,weight)
 
 function FruchtermanReingoldLayout()
 {
-	 EPSILON = 0.000001
-	 ALPHA = 0.1
+	var EPSILON = 0.000001
+	var ALPHA = 0.1
 	this.temp = 30
 	this.mintemp = .1
 
@@ -137,11 +152,9 @@ function FruchtermanReingoldLayout()
 	this.init = function(graph,width,height)
 	{
 
-		
-		
 		this.temp = width / 10;
 		
-		this.forceConstant = 0.75 * Math.sqrt(height*width/graph.nNodes());
+		this.forceConstant = 0.3 * Math.sqrt(height*width/graph.nNodes());
 
 		var scaleW = ALPHA*width/2;
 		var scaleH = ALPHA*height/2;	
@@ -158,7 +171,7 @@ function FruchtermanReingoldLayout()
 	this.run = function(graph,width,height)
 	{
 		//Run it 10 times
-		for(i = 0; i < 5; i++) 
+		for(i = 0; i < 2; i++) 
 		{		
 			//Calculate repulsion
 			//alert("rep")
@@ -238,8 +251,9 @@ function FruchtermanReingoldLayout()
 
 		var yDisp = n.disp[1]/deltaLength * Math.min(deltaLength, this.temp);
 		
-	       	n.x = Math.min(Math.max(n.x + xDisp,0),width);
-		n.y = Math.min(Math.max(n.y + yDisp,0),height);
+		//Size matters, make sure none of the node goes outside
+	       	n.x = Math.min(Math.max(n.x + xDisp,n.size),width-n.size);
+		n.y = Math.min(Math.max(n.y + yDisp,n.size),height-n.size);
 
 	}
 
