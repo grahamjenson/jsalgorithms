@@ -7,29 +7,33 @@
 
 $(document).ready(function(){
 
-	
+	ctx = $('#canvas')[0].getContext("2d");
 
 	$('#draw').click(function()
 	{
 		initgraph()
 	})
-
+	
+	$('#random').click(function()
+	{
+		initgraph()
+	})
 	initgraph = function()
 	{
 		textgraph = $('#graphml')
-		
 		graph = parsegraph(textgraph.val())
+		draw(ctx)
 	}
 	initgraph()
 	
 	
 	
- 	setInterval(draw, 1000);
+ 	setInterval(draw, 100);
 	
-	ctx = $('#canvas')[0].getContext("2d");
+	
 	
 	function draw() {
-		ctx.clearRect(0, 0, ctx.width, ctx.height);
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 		graph.draw(ctx)
 
 	}	
@@ -64,13 +68,13 @@ $(document).ready(function(){
 
 <form>
 	<textarea cols="50" rows="4" id="graphml">
-a -> b
-b -> c
-c -> a </textarea>
+
+</textarea>
 
 	
 </form>
 
+<button id="random">random</button> 
 <button id="draw">draw</button> 
 
 </body>

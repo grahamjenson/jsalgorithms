@@ -1,21 +1,44 @@
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
 function Graph()
 {
-    var V = [];
-    var E = [];
-
-    this.nodes = V
-    this.edges = E
+    this.V = [];
+    this.E = [];
+    
+    this.nNodes = function()
+    {
+	var size = 0, key;
+	for (key in this.V) {
+		size++;
+	}
+    	return size;
+    }
+    
+    this.nEdges = function()
+    {
+	var size = 0, key;
+	for (key in this.E) {
+		size++;
+	}
+    	return size;
+    }
 
     this.getNode = function(nodename){
 
-	if (nodename in V){	
-	    return V[nodename]
+	if (nodename in this.V){	
+	    return this.V[nodename]
 	}
 	else
 	{	
 		
 	    n = new Node(nodename)
-	    V[nodename] = n
+	    this.V[nodename] = n
 	    return n
 	}
 	
@@ -24,34 +47,41 @@ function Graph()
 
     this.addEdge = function(n1,n2,weight){
 	e = new Edge(n1,n2,weight)
-	E.push(e)
+	this.E.push(e)
     }
 
-    this.getOutEdges = function(n){
+    this.getEdges = function(n){
 	var ret = []
-	for(e in E)
+	for(e in this.E)
 	{
-	    if(E[e].from == n)
+	    if(this.E[e].from == n || this.E[e].to == n)
 	    {
-		ret.push(E[e])
+		ret.push(this.E[e])
 	    }
 
 	}
 	return ret
     }
 
-this.draw = function(canvas)
+	this.layout = new FruchtermanReingoldLayout()
+	this.first = true
+
+	this.draw = function(ctx)
 	{
 		//calculate new positions
-		friteration(graph)
-		
-		for(i in graph.edges)
+		if(this.first) 
 		{
-			graph.edges[i].draw(canvas)
+			this.layout.init(this,ctx.canvas.width,ctx.canvas.height)
+			this.first = false
+		}
+		this.layout.run(this,ctx.canvas.width,ctx.canvas.height)
+		for(i in this.E)
+		{
+			this.E[i].draw(ctx)
 		}		
-		for(i in graph.nodes)
+		for(i in this.V)
 		{
-			graph.nodes[i].draw(canvas)
+			this.V[i].draw(ctx)
 		}
 	}	
 }
@@ -59,15 +89,20 @@ this.draw = function(canvas)
 function Node(n)
 {
 	this.nodename = n
-	this.x = Math.random()*200
-	this.y = Math.random()*200
-	
+	this.x = 0
+	this.y = 0
+
+	//x to x + size, and y + size 
+	this.size = 10
+
 	this.draw = function(canvas)
 	{	
+		
 		canvas.strokeStyle = "#000000";
 		canvas.fillStyle = "#FFFF00";
 		canvas.beginPath();
-  		canvas.arc(this.x, this.y, 10, 0, Math.PI*2, true); 
+		//x y = top left corner, size == radius, 0 is start angle, 2pi is end angle, true is anticlockwise
+  		canvas.arc(this.x, this.y, this.size, 0, Math.PI*2, true); 
   		canvas.closePath();
 		canvas.stroke();
 		canvas.fill();
@@ -82,54 +117,133 @@ function Edge(n1,n2,weight)
 
 	this.draw = function(canvas)
 	{
-		canvas.moveTo(n1.x,n1.y);
-  		canvas.lineTo(n2.x,n2.y);
+		canvas.moveTo(this.from.x,this.from.y);
+  		canvas.lineTo(this.to.x,this.to.y);
   		canvas.stroke();
 	}
 }
 
 
 
-function friteration(graph)
+function FruchtermanReingoldLayout()
 {
-	/**
-area := W * L; { W and L are the width and length of the frame }
-G := (V, E); { the vertices are assigned random initial positions }
-k :=
-f u n c t i o n f a (z) := begin return x 2 /k e n d ;
-f u n c t i o n f r(z) := begin return k 2 /z e n d ;
-for i := 1 to iterations do begin
-{ calculate repulsive forces}
-for v in V do begin
-{ each vertex has two vectors: .pos and .disp }
-v.disp := 0;
-for u in V d o
-if (u # v) then begin
-{ ∆ is short hand for the difference}
-{ vector between the positions of the two vertices )
-∆ := v.pos - u.pos;
-v.disp := v.disp + ( ∆ /| ∆ |) * fr (| ∆ |)
-end
-end
-{ calculate attractive forces }
-for e in E do begin
-{ each edge is an ordered pair of vertices .v and .u }
-∆ := e.v.pos – e.u.pos
-e.v.disp := e.v.disp – ( ∆/| ∆ |) * fa (| ∆ |);
-e.u. disp := e.u.disp + ( ∆ /| ∆ |) * fa (| ∆ |)
-end
-{ limit the maximum displacement to the temperature t }
-{ and then prevent from being displaced outside frame}
-for v in V do begin
-v.pos := v.pos + ( v. disp/ |v.disp|) * min ( v.disp, t );
-v.pos.x := min(W/2, max(-W/2, v.pos.x));
-v.pos.y := min(L/2, max(–L/2, v.pos.y))
-end
-{ reduce the temperature as the layout approaches a better configuration }
-t := cool(t)
-end
+	 EPSILON = 0.000001
+	 ALPHA = 0.1
+	this.temp = 30
+	this.mintemp = .1
 
-**/
+	this.forceConstant = 0
+
+	this.init = function(graph,width,height)
+	{
+
+		
+		
+		this.temp = width / 10;
+		
+		this.forceConstant = 0.75 * Math.sqrt(height*width/graph.nNodes());
+
+		var scaleW = ALPHA*width/2;
+		var scaleH = ALPHA*height/2;	
+		for(ni in graph.V)
+		{
+			//Set initial places
+			n = graph.V[ni]
+			n.x = width/2 + Math.random()*scaleW;
+			n.y = height/2 + Math.random()*scaleH;
+		}
+	}
+	
+
+	this.run = function(graph,width,height)
+	{
+		//Calculate repulsion
+		//alert("rep")
+		for(n in graph.V)
+		{
+			this.calculateRepulsion(graph,graph.V[n])
+		}
+		
+		//Calculate attraction
+		//alert("att")
+		for(e in graph.E)
+		{
+			this.calculateAttraction(graph.E[e])
+		}
+
+		//Calculate New Positions
+		//alert("pos")
+		for(n in graph.V)
+		{
+			this.calculatePosition(graph.V[n],width,height)
+		}
+		
+		//cool
+		this.cool()
+ 		
+	}
+
+	this.calculateRepulsion = function(g,n1)
+	{
+	 	
+		n1.disp = [0,0]
+
+		for (ni in g.V) {
+			n2 = g.V[ni]	
+		    	if (n1 != n2) {
+		      		var xDelta = n1.x - n2.x;
+		      		var yDelta = n1.y - n2.y;
+
+		       		var deltaLength = Math.max(EPSILON,Math.sqrt(xDelta*xDelta + yDelta*yDelta));
+
+		       		var force = (this.forceConstant*this.forceConstant) / deltaLength;
+		       		n1.disp[0] = n1.disp[0] + (xDelta/deltaLength)*force;
+		       		n1.disp[1] = n1.disp[1] + (yDelta/deltaLength)*force;
+		    }
+		}
+	}
+
+	this.calculateAttraction = function(edge)
+	{
+		
+		var n1 = edge.to
+		var n2 = edge.from
+		
+
+		var xDelta = n1.x - n2.x;
+		var yDelta = n1.y - n2.y;
+
+		var deltaLength = Math.max(EPSILON, Math.sqrt(xDelta*xDelta + yDelta*yDelta));
+
+		var force = (deltaLength*deltaLength) / this.forceConstant;
+
+		var xDisp = (xDelta/deltaLength) * force;
+		var yDisp = (yDelta/deltaLength) * force;
+		
+		n1.disp[0] -= xDisp; n1.disp[1] -= yDisp;
+		n2.disp[0] += xDisp; n2.disp[1] += yDisp;
+	}
+
+	
+
+	this.calculatePosition = function(n,width,height)
+	{
+ 	
+		var deltaLength = Math.max(EPSILON,Math.sqrt(n.disp[0]*n.disp[0] + n.disp[1]*n.disp[1]));
+		
+		var xDisp = n.disp[0]/deltaLength * Math.min(deltaLength, this.temp);
+
+		var yDisp = n.disp[1]/deltaLength * Math.min(deltaLength, this.temp);
+		
+	       	n.x = Math.min(Math.max(n.x + xDisp,0),width);
+		n.y = Math.min(Math.max(n.y + yDisp,0),height);
+
+	}
+
+	this.cool = function()
+	{
+		this.temp = Math.max(this.temp/1.2,this.mintemp)
+	}
 
 }
        
