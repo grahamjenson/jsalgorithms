@@ -157,30 +157,33 @@ function FruchtermanReingoldLayout()
 
 	this.run = function(graph,width,height)
 	{
-		//Calculate repulsion
-		//alert("rep")
-		for(n in graph.V)
-		{
-			this.calculateRepulsion(graph,graph.V[n])
-		}
+		//Run it 10 times
+		for(i = 0; i < 5; i++) 
+		{		
+			//Calculate repulsion
+			//alert("rep")
+			for(n in graph.V)
+			{
+				this.calculateRepulsion(graph,graph.V[n])
+			}
 		
-		//Calculate attraction
-		//alert("att")
-		for(e in graph.E)
-		{
-			this.calculateAttraction(graph.E[e])
-		}
+			//Calculate attraction
+			//alert("att")
+			for(e in graph.E)
+			{
+				this.calculateAttraction(graph.E[e])
+			}
 
-		//Calculate New Positions
-		//alert("pos")
-		for(n in graph.V)
-		{
-			this.calculatePosition(graph.V[n],width,height)
-		}
+			//Calculate New Positions
+			//alert("pos")
+			for(n in graph.V)
+			{
+				this.calculatePosition(graph.V[n],width,height)
+			}
 		
-		//cool
-		this.cool()
- 		
+			//cool
+			this.cool()
+ 		}
 	}
 
 	this.calculateRepulsion = function(g,n1)
@@ -242,7 +245,7 @@ function FruchtermanReingoldLayout()
 
 	this.cool = function()
 	{
-		this.temp = Math.max(this.temp/1.2,this.mintemp)
+		this.temp = Math.max(this.temp/1.1,this.mintemp)
 	}
 
 }
