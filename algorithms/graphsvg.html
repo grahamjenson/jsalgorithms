@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script language="javascript" src="jquery-1.5.1.js"></script>
+	<script language="javascript" src="graph.js"></script>
+	<script language="javascript">
+
+$(document).ready(function(){
+
+	ctx = $('#canvas')[0].getContext("2d");
+
+	$('#draw').click(function()
+	{
+		initgraph()
+	})
+	
+	$('#random').click(function()
+	{
+		randomgraph()
+		initgraph()		
+	})
+	
+	randomgraph = function()
+	{
+		textgraph = $('#graphml')[0]
+		textgraph.value = ""
+		var nnodes = 100
+		var nedges = 100	
+		for(i = 0; i < nedges; i++)
+		{
+			textgraph.value += Math.floor(Math.random()*nnodes) + " - " + Math.floor(Math.random()*nnodes) + "\n"
+		}
+	}
+
+	initgraph = function()
+	{
+		textgraph = $('#graphml')[0]
+		graph = parsegraph(textgraph.value)
+		draw(ctx)
+	}
+	randomgraph()
+	initgraph()
+	
+	
+	
+ 	setInterval(draw, 100);
+	
+	
+	
+	function draw() {
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+		graph.draw(ctx)
+
+	}	
+
+	function parsegraph(text)
+	{
+		var graph = new Graph()
+		lines = text.split("\n")
+		for(i in lines)
+		{
+			var line = lines[i].trim()
+			var edges = line.split(" ")
+			if(edges.length == 3)
+			{
+				var n1 = graph.getNode(edges[0].trim())
+				var n2 = graph.getNode(edges[2].trim())
+				graph.addEdge(n1,n2)
+			}
+				
+		}
+		return graph
+	}
+
+
+})	
+  </script>
+</head>
+<body>
+
+
+<canvas id="canvas" width="600" height="600"></canvas>
+
+<form>
+	<textarea cols="50" rows="4" id="graphml">
+
+</textarea>
+
+	
+</form>
+
+<button id="random">random</button> 
+<button id="draw">draw</button> 
+</body>
+</html>
