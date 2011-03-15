@@ -2,7 +2,8 @@ function Graph()
 {
     this.V = [];
     this.E = [];
-    
+    this.visualgraph = []
+
     this.nNodes = function()
     {
 	var size = 0, key;
@@ -85,6 +86,7 @@ function Graph()
 function Node(n)
 {
 	this.nodename = n
+	this.visualnode = []
 
 	//top left corner
 	this.x = 0
@@ -104,38 +106,16 @@ function Node(n)
 		return this.y+this.size/2
 	}
 
-	this.draw = function(canvas)
-	{	
-		//Clean, a little outside too, just to be sure
-		
 
-		canvas.strokeStyle = "#005580";
-		canvas.fillStyle = "#7BC1DB";
-		canvas.beginPath();
-		//x y = top left corner, size == radius, 0 is start angle, 2pi is end angle, true is anticlockwise
-  		canvas.arc(this.centerx(), this.centery(), this.size/2, 0, Math.PI*2, true); 
-		canvas.fill();  		
-		canvas.closePath();
-		canvas.stroke();
-		
-	}
 }
 
 function Edge(n1,n2,weight)
 {
+	this.visualedge = []
     	this.weight = (typeof weight == 'undefined')? 1 : weight
     	this.from = n1
     	this.to = n2
 
-	this.draw = function(canvas)
-	{
-
-		canvas.beginPath();
-		canvas.moveTo(this.from.centerx(),this.from.centery());
-  		canvas.lineTo(this.to.centerx(),this.to.centery());
-  		canvas.stroke();
-		canvas.closePath();
-	}
 }
 
 

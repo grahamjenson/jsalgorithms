@@ -2,24 +2,50 @@
 <html>
 <head>
 	<script language="javascript" src="jquery-1.5.1.js"></script>
-	<script language="javascript" src="graph.js"></script>
+	<style type="text/css">@import "jquery.svg.css";</style> 
+	<script type="text/javascript" src="jquery.svg.js"></script>
+	<script type="text/javascript" src="jquery.svganim.js"></script>
+
+	<!-- My scripts-->
+	<script language="javascript" src="graphsvg.js"></script>
 	<script language="javascript">
 
+
+ 
+
+ 
+    
 $(document).ready(function(){
 
-	ctx = $('#canvas')[0].getContext("2d");
 
+	strokeStyle = "#005580";
+	fillStyle = "#7BC1DB";
+
+	$('#box').svg()
+	svg = $('#box').svg('get')
+		
+	a = svg.circle(100, 100, 50, {id : "a", fill: 'red', stroke: 'blue', strokeWidth: 5});
+	a = true
 	$('#draw').click(function()
 	{
-		initgraph()
+		if(a) 
+		{
+			$("#a").animate({"svgR":100},1000)
+		}		
+		else
+		{
+			$("#a").animate({"svgR":20},1000)
+		}
+		a = !a
 	})
 	
 	$('#random').click(function()
 	{
-		randomgraph()
-		initgraph()		
+		randomgraph()	
 	})
-	
+
+
+
 	randomgraph = function()
 	{
 		textgraph = $('#graphml')[0]
@@ -32,45 +58,6 @@ $(document).ready(function(){
 		}
 	}
 
-	initgraph = function()
-	{
-		textgraph = $('#graphml')[0]
-		graph = parsegraph(textgraph.value)
-		draw(ctx)
-	}
-	randomgraph()
-	initgraph()
-	
-	
-	
- 	setInterval(draw, 100);
-	
-	
-	
-	function draw() {
-		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-		graph.draw(ctx)
-
-	}	
-
-	function parsegraph(text)
-	{
-		var graph = new Graph()
-		lines = text.split("\n")
-		for(i in lines)
-		{
-			var line = lines[i].trim()
-			var edges = line.split(" ")
-			if(edges.length == 3)
-			{
-				var n1 = graph.getNode(edges[0].trim())
-				var n2 = graph.getNode(edges[2].trim())
-				graph.addEdge(n1,n2)
-			}
-				
-		}
-		return graph
-	}
 
 
 })	
@@ -79,8 +66,12 @@ $(document).ready(function(){
 <body>
 
 
-<canvas id="canvas" width="600" height="600"></canvas>
+<svg width="40%" height="40%"
+	id="box"
+	xmlns="http://www.w3.org/2000/svg" version="1.1" 
+>
 
+</svg>
 <form>
 	<textarea cols="50" rows="4" id="graphml">
 
