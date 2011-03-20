@@ -5,9 +5,10 @@
 	<style type="text/css">@import "jquery.svg.css";</style> 
 	<script type="text/javascript" src="jquery.svg.js"></script>
 	<script type="text/javascript" src="jquery.svganim.js"></script>
-
+	
 	<!-- My scripts-->
 	<script language="javascript" src="graphsvg.js"></script>
+	<script language="javascript" src="graphparser.js"></script>
 	<script language="javascript">
 
 
@@ -21,44 +22,13 @@ $(document).ready(function(){
 	strokeStyle = "#005580";
 	fillStyle = "#7BC1DB";
 
-	$('#box').svg()
-	svg = $('#box').svg('get')
+	//$('#box').svg()
+	//svg = $('#box').svg('get')
 		
-	a = svg.circle(100, 100, 50, {id : "a", fill: 'red', stroke: 'blue', strokeWidth: 5});
-	a = true
-	$('#draw').click(function()
-	{
-		if(a) 
-		{
-			$("#a").animate({"svgR":100},1000)
-		}		
-		else
-		{
-			$("#a").animate({"svgR":20},1000)
-		}
-		a = !a
-	})
+	//a = svg.circle(100, 100, 50, {id : "a", fill: 'red', stroke: 'blue', strokeWidth: 5});
+	//a = true
 	
-	$('#random').click(function()
-	{
-		randomgraph()	
-	})
-
-
-
-	randomgraph = function()
-	{
-		textgraph = $('#graphml')[0]
-		textgraph.value = ""
-		var nnodes = 100
-		var nedges = 100	
-		for(i = 0; i < nedges; i++)
-		{
-			textgraph.value += Math.floor(Math.random()*nnodes) + " - " + Math.floor(Math.random()*nnodes) + "\n"
-		}
-	}
-
-
+	parse($("#graphml")[0].value)
 
 })	
   </script>
@@ -74,13 +44,16 @@ $(document).ready(function(){
 </svg>
 <form>
 	<textarea cols="50" rows="4" id="graphml">
+graph nambe { 
+ a -- b;
+ c -- b; 
+}
 
 </textarea>
 
 	
 </form>
 
-<button id="random">random</button> 
 <button id="draw">draw</button> 
 </body>
 </html>

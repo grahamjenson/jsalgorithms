@@ -3,6 +3,7 @@ function Graph()
     this.V = [];
     this.E = [];
     this.visualgraph = []
+    this.name = ""
 
     this.nNodes = function()
     {
