@@ -1,10 +1,16 @@
 function Graph()
 {
+    this.directed = false;
     this.V = [];
     this.E = [];
-    this.visualgraph = []
+    this.nodeDefaults = []
+    this.edgeDefults = []
+    this.graphdefaults = []
     this.name = ""
 
+    this.defaultsAppend(defaults)
+
+    //Number of nodes
     this.nNodes = function()
     {
 	var size = 0, key;
@@ -14,6 +20,7 @@ function Graph()
     	return size;
     }
     
+    //number of edges
     this.nEdges = function()
     {
 	var size = 0, key;
@@ -31,7 +38,7 @@ function Graph()
 	else
 	{	
 		
-	    n = new Node(nodename)
+	    var n = new Node(nodename)
 	    this.V[nodename] = n
 	    return n
 	}
@@ -39,9 +46,10 @@ function Graph()
 	
     }
 
-    this.addEdge = function(n1,n2,weight){
-	e = new Edge(n1,n2,weight)
+    this.addEdge = function(n1,n2){
+	var e = new Edge(n1,n2)
 	this.E.push(e)
+	return e
     }
 
     this.getEdges = function(n){
@@ -87,7 +95,6 @@ function Graph()
 function Node(n)
 {
 	this.nodename = n
-	this.visualnode = []
 
 	//top left corner
 	this.x = 0

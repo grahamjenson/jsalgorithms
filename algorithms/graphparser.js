@@ -3,7 +3,7 @@
 NAME = [a-zA-Z][a-zA-Z0-9]
 T = GRAPH | DEFAULT | NODE | EDGE
 ID = NAME ["."NAME]*
-GRAPH = GRAPHTYPE NAME "{\n" [T "\n"] * "}"
+GRAPH = GRAPHTYPE NAME " {\n" [T "\n"] * "}"
 GRAPHTYPE = "digraph" | "graph"
 
 NODE = NAME | PROPS
@@ -45,25 +45,41 @@ parseGraph = function(lines,graph)
 	while(line != "}")
 	{
 		if(line.startswith("nodes")) {
-			//Default nodes		
+			//Default nodes
+			var ss = $.trim(line.substr("nodes".length,line.length))
+			parseDefaultNodes(ss,graph)	
 		}
 		else if(line.startswith("edges")) {
-			//Default edges		
+			//Default edges
+			var ss = $.trim(line.substr("edges".length,line.length))
+			parseDefaultEdges(ss,graph)	
 		}
 		else if(line.startswith("graphs")) {
-			//Default graphs		
+			//Default graphs
+			var ss = $.trim(line.substr("graphs".length,line.length))		
 		}
-		else if(line.startswith("graph") || line.startswith("digraph")) {
-			//Create Subgraph		
+		else if(line.startswith("graph")) {
+			//Create Subgraph
+			var ss = $.trim(line.substr("graph".length,line.length))
+			var name = ss.split(" ",1)[0]
+			var g = graph.getSubGraph(name)
+			parseGraph(lines,g)			
 		}
-		else if(line.split("-").length > 1){
-			//create Edge	
+		else if(line.startswith("digraph")) {
+			//Create Subgraph
+			var ss = $.trim(line.substr("digraph".length,line.length))
+			var name = ss.split(" ",1)[0]
+			var g = graph.getSubDirectedGraph(name)
+			parseGraph(lines,g)		
+		}
+		else if(line.split(" - ").length > 1){
+			//create Edge
+			var edge = graph.	
 		}
 		else {
 			//create Node (Nothing Else fits)
 		}
 	}
-	return graph
 }
 
 parseDefaultNodes = function(line,graph)
