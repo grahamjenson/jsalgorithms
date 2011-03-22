@@ -1,14 +1,55 @@
-function Graph()
+//Depends on Jquery $.extends
+function Graph(graphname)
 {
+    //Properties
     this.directed = false;
-    this.V = [];
-    this.E = [];
-    this.nodeDefaults = []
-    this.edgeDefults = []
-    this.graphdefaults = []
-    this.name = ""
+    this.name = graphname
+    this.p = {}
 
-    this.defaultsAppend(defaults)
+    //Vertices, Edges and subgraphs
+    this.V = {};
+    this.E = {};
+    this.G = {};
+
+    //Default values for all other 
+    this.nodeDefaults = {}
+    this.edgeDefults = {}
+    this.p
+    
+
+    //Construction methods
+    this.getNode = function(nodename){
+	if (nodename in this.V){	
+	    return this.V[nodename]
+	}
+	else
+	{			
+	    var n = new Node(nodename)
+	    this.V[nodename] = n
+	    $.extend(n.p,nodeDefaults)
+	    return n
+	}
+    }
+
+    this.addEdge = function(n1,n2){
+	var e = new Edge(n1,n2)
+	this.E.push(e)
+	return e
+    }
+
+    this.getSubGraph = function(n)
+    {
+	if (n in this.G){	
+	    return this.G[n]
+	}
+	else
+	{			
+	    var g = new Graph(n)
+	    this.G[n] = g
+	    $.extend(g.p,this.p)
+	    return g
+	}
+    }
 
     //Number of nodes
     this.nNodes = function()
@@ -30,28 +71,6 @@ function Graph()
     	return size;
     }
 
-    this.getNode = function(nodename){
-
-	if (nodename in this.V){	
-	    return this.V[nodename]
-	}
-	else
-	{	
-		
-	    var n = new Node(nodename)
-	    this.V[nodename] = n
-	    return n
-	}
-	
-	
-    }
-
-    this.addEdge = function(n1,n2){
-	var e = new Edge(n1,n2)
-	this.E.push(e)
-	return e
-    }
-
     this.getEdges = function(n){
 	var ret = []
 	for(e in this.E)
@@ -63,192 +82,24 @@ function Graph()
 
 	}
 	return ret
-    }
-
-	this.layout = new FruchtermanReingoldLayout()
-	this.first = true
-
-	this.draw = function(ctx)
-	{
-		//calculate new positions
-		if(this.first) 
-		{
-			//clean off what was there
-			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-			//init the layout
-			this.layout.init(this,ctx.canvas.width,ctx.canvas.height)
-			//Never again
-			this.first = false
-		}
-		this.layout.run(this,ctx.canvas.width,ctx.canvas.height)
-		for(i in this.E)
-		{
-			this.E[i].draw(ctx)
-		}		
-		for(i in this.V)
-		{
-			this.V[i].draw(ctx)
-		}
-	}	
+    }	
 }
 
 function Node(n)
 {
+	this.p
 	this.nodename = n
-
-	//top left corner
-	this.x = 0
-	this.y = 0
-
-	//x to x + size, and y + size 
-	this.size = 20
-
-	//util function for center
-	this.centerx = function()
-	{
-		return this.x+this.size/2
-	}
-
-	this.centery = function()
-	{
-		return this.y+this.size/2
-	}
-
-
 }
 
-function Edge(n1,n2,weight)
+function Edge(n1,n2)
 {
-	this.visualedge = []
-    	this.weight = (typeof weight == 'undefined')? 1 : weight
+	this.p
     	this.from = n1
     	this.to = n2
-
+	
 }
 
 
 
-function FruchtermanReingoldLayout()
-{
-	var EPSILON = 0.000001
-	var ALPHA = 0.1
-	this.temp = 30
-	this.mintemp = .1
 
-	this.forceConstant = 0
-
-	this.init = function(graph,width,height)
-	{
-
-		this.temp = width / 10;
-		
-		this.forceConstant = 0.3 * Math.sqrt(height*width/graph.nNodes());
-
-		var scaleW = ALPHA*width/2;
-		var scaleH = ALPHA*height/2;	
-		for(ni in graph.V)
-		{
-			//Set initial places
-			n = graph.V[ni]
-			n.x = width/2 + Math.random()*scaleW;
-			n.y = height/2 + Math.random()*scaleH;
-		}
-	}
-	
-
-	this.run = function(graph,width,height)
-	{
-		//Run it 10 times
-		for(i = 0; i < 2; i++) 
-		{		
-			//Calculate repulsion
-			//alert("rep")
-			for(n in graph.V)
-			{
-				this.calculateRepulsion(graph,graph.V[n])
-			}
-		
-			//Calculate attraction
-			//alert("att")
-			for(e in graph.E)
-			{
-				this.calculateAttraction(graph.E[e])
-			}
-
-			//Calculate New Positions
-			//alert("pos")
-			for(n in graph.V)
-			{
-				this.calculatePosition(graph.V[n],width,height)
-			}
-		
-			//cool
-			this.cool()
- 		}
-	}
-
-	this.calculateRepulsion = function(g,n1)
-	{
-	 	
-		n1.disp = [0,0]
-
-		for (ni in g.V) {
-			n2 = g.V[ni]	
-		    	if (n1 != n2) {
-		      		var xDelta = n1.x - n2.x;
-		      		var yDelta = n1.y - n2.y;
-
-		       		var deltaLength = Math.max(EPSILON,Math.sqrt(xDelta*xDelta + yDelta*yDelta));
-
-		       		var force = (this.forceConstant*this.forceConstant) / deltaLength;
-		       		n1.disp[0] = n1.disp[0] + (xDelta/deltaLength)*force;
-		       		n1.disp[1] = n1.disp[1] + (yDelta/deltaLength)*force;
-		    }
-		}
-	}
-
-	this.calculateAttraction = function(edge)
-	{
-		
-		var n1 = edge.to
-		var n2 = edge.from
-		
-
-		var xDelta = n1.x - n2.x;
-		var yDelta = n1.y - n2.y;
-
-		var deltaLength = Math.max(EPSILON, Math.sqrt(xDelta*xDelta + yDelta*yDelta));
-
-		var force = (deltaLength*deltaLength) / this.forceConstant;
-
-		var xDisp = (xDelta/deltaLength) * force;
-		var yDisp = (yDelta/deltaLength) * force;
-		
-		n1.disp[0] -= xDisp; n1.disp[1] -= yDisp;
-		n2.disp[0] += xDisp; n2.disp[1] += yDisp;
-	}
-
-	
-
-	this.calculatePosition = function(n,width,height)
-	{
- 	
-		var deltaLength = Math.max(EPSILON,Math.sqrt(n.disp[0]*n.disp[0] + n.disp[1]*n.disp[1]));
-		
-		var xDisp = n.disp[0]/deltaLength * Math.min(deltaLength, this.temp);
-
-		var yDisp = n.disp[1]/deltaLength * Math.min(deltaLength, this.temp);
-		
-		//Size matters, make sure none of the node goes outside
-	       	n.x = Math.min(Math.max(n.x + xDisp,n.size),width-n.size);
-		n.y = Math.min(Math.max(n.y + yDisp,n.size),height-n.size);
-
-	}
-
-	this.cool = function()
-	{
-		this.temp = Math.max(this.temp/1.1,this.mintemp)
-	}
-
-}
        
