@@ -26,12 +26,10 @@ function FruchtermanReingoldLayout(graph,width,height,iter)
 	
 	console.log(this)
 
-
+	
 
 	this.run = function()
 	{
-		//Run it 10 times
-		console.log(this)
 		for(i = 0; i < iter; i++) 
 		{		
 			//Calculate repulsion
@@ -115,8 +113,8 @@ function FruchtermanReingoldLayout(graph,width,height,iter)
 		var yDisp = n.disp[1]/deltaLength * Math.min(deltaLength, this.temp);
 		
 		//Size matters, make sure none of the node goes outside
-	       	n.x = Math.min(Math.max(n.x + xDisp,n.size),width-n.size);
-		n.y = Math.min(Math.max(n.y + yDisp,n.size),height-n.size);
+	       	n.x = Math.min(Math.max(n.x + xDisp,n.p["size"]),width-n.p["size"]);
+		n.y = Math.min(Math.max(n.y + yDisp,n.p["size"]),height-n.p["size"]);
 
 	}
 

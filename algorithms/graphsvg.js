@@ -12,8 +12,8 @@ function Graph(graphname)
     this.G = {};
 
     //Default values for all other 
-    this.nodeDefaults = {"shape":"circle",size:10,fill: "#7BC1DB", stroke: "#005580", strokeWidth: "2"}
-    this.edgeDefaults = {}
+    this.nodeDefaults = {"shape":"circle","size":10,"fill": "#7BC1DB", "stroke": "#005580", "strokeWidth": "2"}
+    this.edgeDefaults = {"strokeWidth":5, "stroke":"black"}
     this.p = {}
     
 
@@ -87,12 +87,30 @@ function Graph(graphname)
 
    this.draw = function(svg)
    {
-	console.log(svg)
+
+	for(i in this.E)
+	{
+		this.E[i].draw(svg)
+	}
+
 	for(i in this.V)
 	{
 		this.V[i].draw(svg)
 	}
-	
+
+
+   }
+
+   this.update = function()
+   {
+	for(i in this.V)
+	{
+		this.V[i].update()
+	}
+	for(i in this.E)
+	{
+		this.E[i].update()
+	}
    }
 }
 
@@ -102,6 +120,7 @@ function Node(n)
 	this.nodename = n
 	this.x = 0
 	this.y = 0
+	this.se
 
 	this.draw = function(svg)
 	{
@@ -110,8 +129,14 @@ function Node(n)
 
 		if(shape == "circle")
 		{
-			svg.circle(this.x, this.y, size, this.p);
+			this.se = svg.circle(this.x, this.y, size, this.p);
 		}
+	}
+
+	this.update = function()
+	{
+		this.se.cx.baseVal.value = this.x
+		this.se.cy.baseVal.value = this.y
 	}
 }
 
@@ -120,9 +145,21 @@ function Edge(n1,n2)
 	this.p = {}
     	this.from = n1
     	this.to = n2
+	
+	this.se 
+
 	this.draw = function(svg)
 	{
-		
+console.log("ASD")
+		this.se = svg.line(n1.x, n2.x, n1.y, n2.y, this.p)
+	}
+	
+	this.update = function()
+	{
+		this.se.x1.baseVal.value = n1.x
+		this.se.x2.baseVal.value = n2.x
+		this.se.y1.baseVal.value = n1.y
+		this.se.y2.baseVal.value = n2.y
 	}
 }
 

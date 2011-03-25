@@ -26,17 +26,30 @@ $(document).ready(function(){
 	$('#box').svg()
 	svg = $('#box').svg('get')
 	
+	textgraph = $('#graphml')[0]
+	textgraph.value = "graph { \n"
+	var nnodes = 500
+	var nedges = 500	
+	for(i = 0; i < nedges; i++)
+	{
+		textgraph.value += Math.floor(Math.random()*nnodes) + " - " + Math.floor(Math.random()*nnodes) + "\n"
+	}
+	textgraph.value += "}"
+
 	var graph  = parse($("#graphml")[0].value)
-	var layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,3);
+	var layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,1);
 	
+	graph.draw(svg);
+
 	update = function()
 	{
 		layout.run()
+		graph.update()
 	}
 
-	setInterval(update, 1000);
+	setInterval(update, 40);
 
-	graph.draw(svg);
+	
 
 	console.log(graph)
 })	
@@ -45,7 +58,7 @@ $(document).ready(function(){
 <body>
 
 
-<svg width="40%" height="40%"
+<svg width="80%" height="80%"
 	id="box"
 	xmlns="http://www.w3.org/2000/svg" version="1.1" 
 >
@@ -55,8 +68,8 @@ $(document).ready(function(){
 	<textarea cols="50" rows="4" id="graphml">
 graph nambe {
  edges [size = 10]
- a [color = blue]
- d
+ a [fill = green]
+ d - c
  a - b [arrow = big]
  c - b [size = 5]
 }
