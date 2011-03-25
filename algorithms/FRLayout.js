@@ -1,41 +1,45 @@
-function FruchtermanReingoldLayout()
+function FruchtermanReingoldLayout(graph,width,height,iter)
 {
+	if(!iter)
+	{
+		iter = 2
+	}
 	var EPSILON = 0.000001
 	var ALPHA = 0.1
 	this.temp = 30
 	this.mintemp = .1
-
-	this.forceConstant = 0
-
-	this.init = function(graph,width,height)
-	{
-
-		this.temp = width / 10;
-		
-		this.forceConstant = 0.3 * Math.sqrt(height*width/graph.nNodes());
-
-		var scaleW = ALPHA*width/2;
-		var scaleH = ALPHA*height/2;	
-		for(ni in graph.V)
-		{
-			//Set initial places
-			n = graph.V[ni]
-			n.x = width/2 + Math.random()*scaleW;
-			n.y = height/2 + Math.random()*scaleH;
-		}
-	}
 	
 
-	this.run = function(graph,width,height)
+	this.temp = width / 10;
+	
+	this.forceConstant = 0.3 * Math.sqrt(height*width/graph.nNodes());
+	var scaleW = ALPHA*width/2;
+	var scaleH = ALPHA*height/2;	
+	for(ni in graph.V)
+	{
+		//Set initial places
+		n = graph.V[ni]
+		n.x = width/2 + Math.random()*scaleW;
+		n.y = height/2 + Math.random()*scaleH;
+	
+	}
+	
+	console.log(this)
+
+
+
+	this.run = function()
 	{
 		//Run it 10 times
-		for(i = 0; i < 2; i++) 
+		console.log(this)
+		for(i = 0; i < iter; i++) 
 		{		
 			//Calculate repulsion
 			//alert("rep")
+			
 			for(n in graph.V)
 			{
-				this.calculateRepulsion(graph,graph.V[n])
+				this.calculateRepulsion(graph.V[n])
 			}
 		
 			//Calculate attraction
@@ -49,7 +53,7 @@ function FruchtermanReingoldLayout()
 			//alert("pos")
 			for(n in graph.V)
 			{
-				this.calculatePosition(graph.V[n],width,height)
+				this.calculatePosition(graph.V[n])
 			}
 		
 			//cool
@@ -57,13 +61,14 @@ function FruchtermanReingoldLayout()
  		}
 	}
 
-	this.calculateRepulsion = function(g,n1)
+
+	this.calculateRepulsion = function(n1)
 	{
 	 	
 		n1.disp = [0,0]
 
-		for (ni in g.V) {
-			n2 = g.V[ni]	
+		for (ni in graph.V) {
+			n2 = graph.V[ni]	
 		    	if (n1 != n2) {
 		      		var xDelta = n1.x - n2.x;
 		      		var yDelta = n1.y - n2.y;
@@ -100,7 +105,7 @@ function FruchtermanReingoldLayout()
 
 	
 
-	this.calculatePosition = function(n,width,height)
+	this.calculatePosition = function(n)
 	{
  	
 		var deltaLength = Math.max(EPSILON,Math.sqrt(n.disp[0]*n.disp[0] + n.disp[1]*n.disp[1]));

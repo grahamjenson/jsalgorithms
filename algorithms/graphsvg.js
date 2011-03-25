@@ -8,13 +8,13 @@ function Graph(graphname)
 
     //Vertices, Edges and subgraphs
     this.V = {};
-    this.E = {};
+    this.E = [];
     this.G = {};
 
     //Default values for all other 
-    this.nodeDefaults = {}
-    this.edgeDefults = {}
-    this.p
+    this.nodeDefaults = {"shape":"circle",size:10,fill: "#7BC1DB", stroke: "#005580", strokeWidth: "2"}
+    this.edgeDefaults = {}
+    this.p = {}
     
 
     //Construction methods
@@ -26,13 +26,14 @@ function Graph(graphname)
 	{			
 	    var n = new Node(nodename)
 	    this.V[nodename] = n
-	    $.extend(n.p,nodeDefaults)
+	    $.extend(n.p,this.nodeDefaults)
 	    return n
 	}
     }
 
     this.addEdge = function(n1,n2){
 	var e = new Edge(n1,n2)
+	$.extend(e.p,this.edgeDefaults)
 	this.E.push(e)
 	return e
     }
@@ -82,21 +83,47 @@ function Graph(graphname)
 
 	}
 	return ret
-    }	
+    }
+
+   this.draw = function(svg)
+   {
+	console.log(svg)
+	for(i in this.V)
+	{
+		this.V[i].draw(svg)
+	}
+	
+   }
 }
 
 function Node(n)
 {
-	this.p
+	this.p = {"id":n}
 	this.nodename = n
+	this.x = 0
+	this.y = 0
+
+	this.draw = function(svg)
+	{
+		var shape = this.p["shape"]
+		var size = this.p["size"]
+
+		if(shape == "circle")
+		{
+			svg.circle(this.x, this.y, size, this.p);
+		}
+	}
 }
 
 function Edge(n1,n2)
 {
-	this.p
+	this.p = {}
     	this.from = n1
     	this.to = n2
-	
+	this.draw = function(svg)
+	{
+		
+	}
 }
 
 

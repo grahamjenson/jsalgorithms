@@ -9,6 +9,7 @@
 	<!-- My scripts-->
 	<script language="javascript" src="graphsvg.js"></script>
 	<script language="javascript" src="graphparser.js"></script>
+	<script language="javascript" src="FRLayout.js"></script>
 	<script language="javascript">
 
 
@@ -19,17 +20,25 @@
 $(document).ready(function(){
 
 
-	strokeStyle = "#005580";
-	fillStyle = "#7BC1DB";
 
-	//$('#box').svg()
-	//svg = $('#box').svg('get')
-		
-	//a = svg.circle(100, 100, 50, {id : "a", fill: 'red', stroke: 'blue', strokeWidth: 5});
-	//a = true
+
+	//init svg
+	$('#box').svg()
+	svg = $('#box').svg('get')
 	
-	parse($("#graphml")[0].value)
+	var graph  = parse($("#graphml")[0].value)
+	var layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,3);
+	
+	update = function()
+	{
+		layout.run()
+	}
 
+	setInterval(update, 1000);
+
+	graph.draw(svg);
+
+	console.log(graph)
 })	
   </script>
 </head>
@@ -44,9 +53,12 @@ $(document).ready(function(){
 </svg>
 <form>
 	<textarea cols="50" rows="4" id="graphml">
-graph nambe { 
- a -- b;
- c -- b; 
+graph nambe {
+ edges [size = 10]
+ a [color = blue]
+ d
+ a - b [arrow = big]
+ c - b [size = 5]
 }
 
 </textarea>
