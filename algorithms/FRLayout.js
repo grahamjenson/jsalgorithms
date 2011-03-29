@@ -7,11 +7,12 @@ function FruchtermanReingoldLayout(graph,width,height,iter)
 	var EPSILON = 0.000001
 	var ALPHA = 0.1
 	this.temp = 30
-	this.mintemp = .1
+	this.mintemp = .01
 	
-
+	this.tdiv = 1.1
 	this.temp = width / 10;
 	
+
 	this.forceConstant = 0.3 * Math.sqrt(height*width/graph.nNodes());
 	var scaleW = ALPHA*width/2;
 	var scaleH = ALPHA*height/2;	
@@ -113,14 +114,25 @@ function FruchtermanReingoldLayout(graph,width,height,iter)
 		var yDisp = n.disp[1]/deltaLength * Math.min(deltaLength, this.temp);
 		
 		//Size matters, make sure none of the node goes outside
-	       	n.x = Math.min(Math.max(n.x + xDisp,n.p["size"]),width-n.p["size"]);
-		n.y = Math.min(Math.max(n.y + yDisp,n.p["size"]),height-n.p["size"]);
+		var dx = Math.round(Math.min(Math.max(n.x + xDisp,n.p["size"]),width-n.p["size"]));
+		var dy = Math.round(Math.min(Math.max(n.y + yDisp,n.p["size"]),height-n.p["size"]));
+		
+		if(dx != n.x)
+		{
+			n.x = dx
+		}
+
+		if(dy != n.y)
+		{
+			n.y = dy
+		}	       	
+		 
 
 	}
 
 	this.cool = function()
 	{
-		this.temp = Math.max(this.temp/1.1,this.mintemp)
+		this.temp = Math.max(this.temp/this.tdiv,this.mintemp)
 	}
 
 }

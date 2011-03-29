@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+	
+
 	<script language="javascript" src="jquery-1.5.1.js"></script>
 	<style type="text/css">@import "jquery.svg.css";</style> 
 	<script type="text/javascript" src="jquery.svg.js"></script>
 	<script type="text/javascript" src="jquery.svganim.js"></script>
 	
+
 	<!-- My scripts-->
 	<script language="javascript" src="graphsvg.js"></script>
+	<script type="text/javascript" src="object.watch.js"></script>
 	<script language="javascript" src="graphparser.js"></script>
 	<script language="javascript" src="FRLayout.js"></script>
 	<script language="javascript">
@@ -28,8 +32,8 @@ $(document).ready(function(){
 	
 	textgraph = $('#graphml')[0]
 	textgraph.value = "graph { \n"
-	var nnodes = 500
-	var nedges = 500	
+	var nnodes = 20
+	var nedges = 20	
 	for(i = 0; i < nedges; i++)
 	{
 		textgraph.value += Math.floor(Math.random()*nnodes) + " - " + Math.floor(Math.random()*nnodes) + "\n"
@@ -37,7 +41,7 @@ $(document).ready(function(){
 	textgraph.value += "}"
 
 	var graph  = parse($("#graphml")[0].value)
-	var layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,1);
+	var layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,10);
 	
 	graph.draw(svg);
 
