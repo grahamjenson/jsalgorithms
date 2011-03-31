@@ -33,6 +33,8 @@ function Graph(graphname)
 
     this.addEdge = function(n1,n2){
 	var e = new Edge(n1,n2)
+	n1.edges.push(e)
+	n2.edges.push(e)
 	$.extend(e.p,this.edgeDefaults)
 	this.E.push(e)
 	return e
@@ -121,6 +123,48 @@ function Node(n)
 	this.x = 0
 	this.y = 0
 	this.se
+	this.edges = []
+
+	this.setX = function(dx)
+	{
+		this.x = dx
+		this.se.setAttribute("cx",this.x)
+		//maintain edges
+		for(i in this.edges)
+		{
+			var e = this.edges[i]
+			if(e.from == this)
+			{
+				e.se.setAttribute("x1",this.x)
+			}
+			//not else if, because e.from == e.to
+			if(e.to == this)
+			{
+			//assert(e.to == this)
+				e.se.setAttribute("x2",this.x)
+			}
+		}
+	}
+
+	this.setY = function(dy)
+	{
+		this.y = dy
+		this.se.setAttribute("cy",this.y)
+		for(i in this.edges)
+		{
+			var e = this.edges[i]
+			if(e.from == this)
+			{
+				e.se.setAttribute("y1",this.y)
+			}
+
+			if(e.to == this)
+			{
+			//assert(e.to == this)
+				e.se.setAttribute("y2",this.y)
+			}
+		}
+	}
 
 	this.draw = function(svg)
 	{
@@ -131,13 +175,14 @@ function Node(n)
 		{
 			this.se = svg.circle(this.x, this.y, size, this.p);
 		}
+
+		this.se.node = this;
+
+		//The mousy stuff
+		this.se.onmouseover = function() {this.setAttribute("fill","black")}
+		this.se.onmouseout = function() {this.setAttribute("fill",this.node.p["fill"])}
 	}
 
-	this.update = function()
-	{
-		this.se.cx.baseVal.value = this.x
-		this.se.cy.baseVal.value = this.y
-	}
 }
 
 function Edge(n1,n2)
@@ -150,17 +195,10 @@ function Edge(n1,n2)
 
 	this.draw = function(svg)
 	{
-console.log("ASD")
-		this.se = svg.line(n1.x, n2.x, n1.y, n2.y, this.p)
+		this.se = svg.line(this.from.x, this.to.x, this.from.y, this.to.y, this.p)
+		this.se.edge = this;
 	}
 	
-	this.update = function()
-	{
-		this.se.x1.baseVal.value = n1.x
-		this.se.x2.baseVal.value = n2.x
-		this.se.y1.baseVal.value = n1.y
-		this.se.y2.baseVal.value = n2.y
-	}
 }
 
 

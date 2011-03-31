@@ -1,19 +1,19 @@
-function FruchtermanReingoldLayout(graph,width,height,iter)
+function FruchtermanReingoldLayout(graph,width,height,iterations)
 {
-	if(!iter)
+	this.iter = iterations
+	if(!this.iter)
 	{
-		iter = 2
+		this.iter = 2
 	}
 	var EPSILON = 0.000001
 	var ALPHA = 0.1
 	this.temp = 30
 	this.mintemp = .01
-	
-	this.tdiv = 1.1
-	this.temp = width / 10;
-	
 
-	this.forceConstant = 0.3 * Math.sqrt(height*width/graph.nNodes());
+	this.tdiv = 1.05
+	this.temp = 30;
+	this.forceConstant = 0.25 * Math.sqrt(height*width/graph.nNodes());
+
 	var scaleW = ALPHA*width/2;
 	var scaleH = ALPHA*height/2;	
 	for(ni in graph.V)
@@ -24,14 +24,17 @@ function FruchtermanReingoldLayout(graph,width,height,iter)
 		n.y = height/2 + Math.random()*scaleH;
 	
 	}
-	
-	console.log(this)
 
 	
+	this.reset = function()
+	{
+		this.temp = 30;
+	}
 
 	this.run = function()
 	{
-		for(i = 0; i < iter; i++) 
+		var dirty = false;
+		for(var i = 0; i < this.iter; i++) 
 		{		
 			//Calculate repulsion
 			//alert("rep")
@@ -52,14 +55,15 @@ function FruchtermanReingoldLayout(graph,width,height,iter)
 			//alert("pos")
 			for(n in graph.V)
 			{
-				this.calculatePosition(graph.V[n])
+				dirty = dirty | this.calculatePosition(graph.V[n])
 			}
-		
-			//cool
-			this.cool()
+			
+			
  		}
+		//cool
+		this.cool();
+		return !dirty;
 	}
-
 
 	this.calculateRepulsion = function(n1)
 	{
@@ -75,8 +79,9 @@ function FruchtermanReingoldLayout(graph,width,height,iter)
 		       		var deltaLength = Math.max(EPSILON,Math.sqrt(xDelta*xDelta + yDelta*yDelta));
 
 		       		var force = (this.forceConstant*this.forceConstant) / deltaLength;
-		       		n1.disp[0] = n1.disp[0] + (xDelta/deltaLength)*force;
-		       		n1.disp[1] = n1.disp[1] + (yDelta/deltaLength)*force;
+				var size = n1.p["size"]
+		       		n1.disp[0] = n1.disp[0] + (xDelta/deltaLength)*force*(size/10);
+		       		n1.disp[1] = n1.disp[1] + (yDelta/deltaLength)*force*(size/10);
 		    }
 		}
 	}
@@ -106,7 +111,7 @@ function FruchtermanReingoldLayout(graph,width,height,iter)
 
 	this.calculatePosition = function(n)
 	{
- 	
+ 		var dirty = false;
 		var deltaLength = Math.max(EPSILON,Math.sqrt(n.disp[0]*n.disp[0] + n.disp[1]*n.disp[1]));
 		
 		var xDisp = n.disp[0]/deltaLength * Math.min(deltaLength, this.temp);
@@ -114,19 +119,24 @@ function FruchtermanReingoldLayout(graph,width,height,iter)
 		var yDisp = n.disp[1]/deltaLength * Math.min(deltaLength, this.temp);
 		
 		//Size matters, make sure none of the node goes outside
-		var dx = Math.round(Math.min(Math.max(n.x + xDisp,n.p["size"]),width-n.p["size"]));
-		var dy = Math.round(Math.min(Math.max(n.y + yDisp,n.p["size"]),height-n.p["size"]));
+		var sw  = parseInt(n.p["strokeWidth"])
+		var size = parseInt(n.p["size"])
+		var dx = Math.round(Math.min(Math.max(n.x + xDisp,size+sw),width-size-sw));
+		var dy = Math.round(Math.min(Math.max(n.y + yDisp,size+sw),height-size-sw));
 		
 		if(dx != n.x)
 		{
-			n.x = dx
+			dirty = true;
+			n.setX(dx)
 		}
 
 		if(dy != n.y)
 		{
-			n.y = dy
+			dirty = true;
+			n.setY(dy)
 		}	       	
-		 
+	
+		return dirty;
 
 	}
 

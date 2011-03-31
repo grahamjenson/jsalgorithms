@@ -30,32 +30,58 @@ $(document).ready(function(){
 	$('#box').svg()
 	svg = $('#box').svg('get')
 	
-	textgraph = $('#graphml')[0]
-	textgraph.value = "graph { \n"
-	var nnodes = 20
-	var nedges = 20	
-	for(i = 0; i < nedges; i++)
-	{
-		textgraph.value += Math.floor(Math.random()*nnodes) + " - " + Math.floor(Math.random()*nnodes) + "\n"
-	}
-	textgraph.value += "}"
+	graph = parse($("#graphml")[0].value)
+	layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,10);
 
-	var graph  = parse($("#graphml")[0].value)
-	var layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,10);
-	
-	graph.draw(svg);
-
-	update = function()
-	{
-		layout.run()
-		graph.update()
-	}
-
-	setInterval(update, 40);
 
 	
 
-	console.log(graph)
+	$('#random').click(function()
+	{
+		textgraph = $('#graphml')[0]
+		textgraph.value = "graph { \n"
+		var nnodes = 100
+		var nedges = 100	
+		for(i = 0; i < nedges; i++)
+		{
+			textgraph.value += Math.floor(Math.random()*nnodes) + " - " + Math.floor(Math.random()*nnodes) + "\n"
+		}
+		textgraph.value += "}"
+	})
+	
+	
+
+	
+	var id = 0;
+	runLayout = function()
+	{
+		graph.draw(svg);
+		clearInterval(id)
+		layout.reset();
+		update = function()
+		{
+			console.log(id)
+			var clean = layout.run()
+			if(clean)
+			{
+				clearInterval(id)
+				console.log("Finshed running layout")
+			}
+		
+		}
+		id = setInterval(update, 40);
+	}
+	
+	runLayout();
+
+
+	$('#draw').click(function()
+	{
+		svg.clear()
+		graph = parse($("#graphml")[0].value)
+		layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,10);
+		runLayout()
+	})
 })	
   </script>
 </head>
@@ -70,12 +96,29 @@ $(document).ready(function(){
 </svg>
 <form>
 	<textarea cols="50" rows="4" id="graphml">
-graph nambe {
- edges [size = 10]
- a [fill = green]
- d - c
- a - b [arrow = big]
- c - b [size = 5]
+graph {
+14 [fill = black, size = 20]
+17 - 14
+18 - 9
+13 - 0
+13 - 5
+18 - 16
+1 - 14
+13 - 9
+nodes [fill = red]
+9 - 12
+0 - 4
+19 - 15
+14 - 14
+14 - 16
+5 - 2
+5 - 4
+2 - 7
+17 - 1
+9 - 12
+4 - 15
+15 - 8
+4 - 2
 }
 
 </textarea>
@@ -84,5 +127,6 @@ graph nambe {
 </form>
 
 <button id="draw">draw</button> 
+<button id="random">random</button> 
 </body>
 </html>
