@@ -87,33 +87,9 @@ function Graph(graphname)
 	return ret
     }
 
-   this.draw = function(svg)
-   {
-
-	for(i in this.E)
-	{
-		this.E[i].draw(svg)
-	}
-
-	for(i in this.V)
-	{
-		this.V[i].draw(svg)
-	}
 
 
-   }
 
-   this.update = function()
-   {
-	for(i in this.V)
-	{
-		this.V[i].update()
-	}
-	for(i in this.E)
-	{
-		this.E[i].update()
-	}
-   }
 }
 
 function Node(n)
@@ -166,67 +142,13 @@ function Node(n)
 		}
 	}
 
-	this.draw = function(svg)
-	{
-		var shape = this.p["shape"]
-		var size = this.p["size"]
-
-		if(shape == "circle")
-		{
-			this.se = svg.circle(this.x, this.y, size, this.p);
-		}
-
-		this.se.node = this;
-
-		//The mousy stuff
-		this.se.onmouseover = function() {
-			this.setAttribute("fill","black")
-
-		}
-	
-		this.se.onmouseout = function() {
-			this.setAttribute("fill",this.node.p["fill"])
-		}
-		
-
-		      function GetTrueCoords(evt)
-      	{
-         // find the current zoom level and pan setting, and adjust the reported
-         //    mouse position accordingly
-         var newScale = SVGRoot.currentScale;
-         var translation = SVGRoot.currentTranslate;
-         TrueCoords.x = (evt.clientX - translation.x)/newScale;
-         TrueCoords.y = (evt.clientY - translation.y)/newScale;
-      	};
-
-
-		this.se.onmousedown = function(evt)
-		{
-			//States the mouse is over it
-			var target = evt.target;                
-        		target.node.setX(evt.clientX-5)
-			target.node.setY(evt.clientY-5)
-		}
-		
-		
-		
-	}
-
 }
 
 function Edge(n1,n2)
 {
 	this.p = {}
-    	this.from = n1
-    	this.to = n2
-	
-	this.se 
-
-	this.draw = function(svg)
-	{
-		this.se = svg.line(this.from.x, this.to.x, this.from.y, this.to.y, this.p)
-		this.se.edge = this;
-	}
+    	this.sourceNode = n1
+    	this.targetNode = n2
 	
 }
 
