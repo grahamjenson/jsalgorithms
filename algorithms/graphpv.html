@@ -17,36 +17,9 @@
 
 $(document).ready(function(){
 
-graph = parse($("#graphml")[0].value)
-
-var w = $(document).width(),
-    h = $(document).height(),
-    colors = pv.Colors.category19();
-
-var vis = new pv.Panel()
-    .width(w)
-    .height(h)
-    .fillStyle("white")
-    .event("mousedown", pv.Behavior.pan())
-    .event("mousewheel", pv.Behavior.zoom());
-
-var force = vis.add(pv.Layout.Force)
-    .nodes(graph.V).links(graph.E);
-
-force.link.add(pv.Line);
 
 
-/*
-force.node.add(pv.Dot)
-    .size(function(d) (d.linkDegree + 4) * Math.pow(this.scale, -1.5))
-    .fillStyle(function(d) d.fix ? "brown" : colors(d.group))
-    .strokeStyle(function() this.fillStyle().darker())
-    .lineWidth(1)
-    .title(function(d) d.nodeName)
-    .event("mousedown", pv.Behavior.drag())
-    .event("drag", force);
 
-vis.render();
 
 	
 
@@ -69,19 +42,47 @@ vis.render();
 		svg.clear()
 		graph = parse($("#graphml")[0].value)
 		layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,10);
-	}) */
+	}) 
 }) 	
   </script>
 </head>
 <body>
 
+<script type="text/javascript+protovis">
 
-<svg width="80%" height="80%"
-	id="box"
-	xmlns="http://www.w3.org/2000/svg" version="1.1" 
->
+graph = parse($("#graphml")[0].value)
 
-</svg>
+var w = $(document).width(),
+    h = $(document).height(),
+    colors = pv.Colors.category19();
+ 
+var vis = new pv.Panel()
+    .width(w)
+    .height(h)
+    .fillStyle("white")
+    .event("mousedown", pv.Behavior.pan())
+    .event("mousewheel", pv.Behavior.zoom());
+ 
+var force = vis.add(pv.Layout.Force)
+    .nodes(graph.V)
+    .links(graph.E);
+ 
+force.link.add(pv.Line);
+ 
+force.node.add(pv.Dot)
+    .size(function(d) (d.linkDegree *10))
+    .fillStyle(function(d) d.fix ? "brown" : colors(d.group))
+    .strokeStyle(function() this.fillStyle().darker())
+    .lineWidth(1)
+    .title(function(d) d.nodeName)
+    .event("mousedown", pv.Behavior.drag())
+    .event("drag", force);
+ 
+vis.render();
+
+</script>
+
+
 <form>
 	<textarea cols="50" rows="4" id="graphml">
 graph {

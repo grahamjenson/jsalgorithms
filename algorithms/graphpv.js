@@ -7,7 +7,8 @@ function Graph(graphname)
     this.p = {}
 
     //Vertices, Edges and subgraphs
-    this.V = {};
+    this.nodes = {} //Map from names to nodes
+    this.V = [];
     this.E = [];
     this.G = {};
 
@@ -19,13 +20,14 @@ function Graph(graphname)
 
     //Construction methods
     this.getNode = function(nodename){
-	if (nodename in this.V){	
-	    return this.V[nodename]
+	if (nodename in this.nodes){	
+	    return this.nodes[nodename]
 	}
 	else
 	{			
 	    var n = new Node(nodename)
-	    this.V[nodename] = n
+	    this.nodes[nodename] = n
+	    this.V.push(n)
 	    $.extend(n.p,this.nodeDefaults)
 	    return n
 	}
@@ -95,10 +97,7 @@ function Graph(graphname)
 function Node(n)
 {
 	this.p = {"id":n}
-	this.nodename = n
-	this.x = 0
-	this.y = 0
-	this.se
+	this.nodeName = n
 	this.edges = []
 
 	this.setX = function(dx)
