@@ -5,7 +5,7 @@ function FruchtermanReingoldLayout(graph,width,height,iterations)
 	{
 		this.iter = 2
 	}
-	var EPSILON = 0.000001
+	var EPSILON = 0.00001
 	var ALPHA = 0.1
 	this.temp = 30
 	this.mintemp = .01
