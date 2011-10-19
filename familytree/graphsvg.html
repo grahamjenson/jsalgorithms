@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+
+	<script language="javascript" src="jquery-1.5.1.js"></script>
+	<style type="text/css">@import "jquery.svg.css";</style> 
+	<script type="text/javascript" src="jquery.svg.js"></script>
+	<script type="text/javascript" src="jquery.svganim.js"></script>
+	
+
+	<!-- My scripts-->
+	<script language="javascript" src="graphsvg.js"></script>
+
+	<script language="javascript">
+
+
+ 
+
+ 
+    
+$(document).ready(function(){
+
+
+
+
+	//init svg
+	$('#box').svg()
+	svg = $('#box').svg('get')
+	
+	graph = parse($("#graphml")[0].value)
+	layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,10);
+
+	
+	
+
+	$('#random').click(function()
+	{
+		textgraph = $('#graphml')[0]
+		textgraph.value = "graph { \n"
+		var nnodes = 100
+		var nedges = 100	
+		for(i = 0; i < nedges; i++)
+		{
+			textgraph.value += Math.floor(Math.random()*nnodes) + " - " + Math.floor(Math.random()*nnodes) + "\n"
+		}
+		textgraph.value += "}"
+	})
+	
+	
+
+	
+	var id = 0;
+	runLayout = function()
+	{
+		graph.draw(svg);
+		clearInterval(id)
+		layout.reset();
+		update = function()
+		{
+			console.log(id)
+			var clean = layout.run()
+			if(clean)
+			{
+				clearInterval(id)
+				console.log("Finshed running layout")
+			}
+		
+		}
+		id = setInterval(update, 40);
+	}
+	
+	runLayout();
+
+
+	$('#draw').click(function()
+	{
+		svg.clear()
+		graph = parse($("#graphml")[0].value)
+		layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,10);
+		runLayout()
+	})
+})	
+  </script>
+</head>
+<body>
+
+
+<svg width="80%" height="80%"
+	id="box"
+	xmlns="http://www.w3.org/2000/svg" version="1.1" 
+>
+
+</svg>
+<form>
+	<textarea cols="50" rows="4" id="graphml">
+graph {
+14 [fill = black, size = 20]
+17 - 14
+18 - 9
+13 - 0
+13 - 5
+18 - 16
+1 - 14
+13 - 9
+nodes [fill = red]
+9 - 12
+0 - 4
+19 - 15
+14 - 14
+14 - 16
+5 - 2
+5 - 4
+2 - 7
+17 - 1
+9 - 12
+4 - 15
+15 - 8
+4 - 2
+}
+
+</textarea>
+
+	
+</form>
+
+<button id="draw">draw</button> 
+<button id="random">random</button> 
+</body>
+</html>
