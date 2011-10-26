@@ -4,9 +4,9 @@
 	
 
 	<script language="javascript" src="jquery-1.5.1.js"></script>
-	<style type="text/css">@import "jquery.svg.css";</style> 
-	<script type="text/javascript" src="jquery.svg.js"></script>
-	<script type="text/javascript" src="jquery.svganim.js"></script>
+	
+	<script type="text/javascript" src="d3/d3.js"></script>
+    	<script type="text/javascript" src="d3/d3.layout.js"></script>
 	
 
 	<!-- My scripts-->
@@ -14,117 +14,102 @@
 
 	<script language="javascript">
 
-
- 
-
- 
-    
-$(document).ready(function(){
-
-
-
-
-	//init svg
-	$('#box').svg()
-	svg = $('#box').svg('get')
+$(document).ready(function(){	
 	
-	graph = parse($("#graphml")[0].value)
-	layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,10);
-
-	
-	
-
-	$('#random').click(function()
-	{
-		textgraph = $('#graphml')[0]
-		textgraph.value = "graph { \n"
-		var nnodes = 100
-		var nedges = 100	
-		for(i = 0; i < nedges; i++)
-		{
-			textgraph.value += Math.floor(Math.random()*nnodes) + " - " + Math.floor(Math.random()*nnodes) + "\n"
-		}
-		textgraph.value += "}"
-	})
-	
-	
-
-	
-	var id = 0;
-	runLayout = function()
-	{
-		graph.draw(svg);
-		clearInterval(id)
-		layout.reset();
-		update = function()
-		{
-			console.log(id)
-			var clean = layout.run()
-			if(clean)
-			{
-				clearInterval(id)
-				console.log("Finshed running layout")
-			}
+	Function.prototype.compose  = function(argFunction) {
+    var invokingFunction = this;
+    return function() {
+        return  invokingFunction.call(this,argFunction.apply(this,arguments));
+    }
+}
+	var family = {
+		1 : {
+			firstname : "Georgette",
+			lastname : "Jenson",
+			birthdate : "1954",
+			sex : 'f'
+		},
 		
-		}
-		id = setInterval(update, 40);
+		2 : {
+			firstname : "Deryk",
+			lastname : "Jenson",
+			birthdate : "1953",
+			sex : 'm'
+		},
+		
+		3 : {
+			firstname : "Kim",
+			lastname : "Jenson",
+			birthdate : "1984",
+			sex : 'f',
+			parents : [1,2]
+		},
+		
+		4 : {
+			firstname : "Graham",
+			lastname : "Jenson",
+			birthdate : "1985",
+			sex : 'm',
+			parents : [1,2]
+		},
+		
+		5 : {
+			firstname : "Vivien",
+			lastname : "Jenson",
+			birthdate : "1987",
+			sex : 'f',
+			parents : [1,2]
+		},
+		
 	}
 	
-	runLayout();
+	
+	
+	ft = new FamilyTree(family)
+	ft.addPerson(gj)
+	ft.addPerson(mum)
+	ft.addPerson(dad)
+	ft.addPerson(kj)
+	ft.addPerson(vj)
+	
+	ft.layout()
+	
+	w = 300
+	h = 300
+	
+	var svg = d3.select("#tree").append("svg:svg")
+	.attr("width", w)
+	.attr("height", h);
 
+	var sy = d3.scale.linear()
+	.domain([d3.min(ft.people,ft.getY), d3.max(ft.people,ft.getY)])
+	.range([0,h])
+	.compose(ft.getY);
 
-	$('#draw').click(function()
-	{
-		svg.clear()
-		graph = parse($("#graphml")[0].value)
-		layout = new FruchtermanReingoldLayout(graph,svg._svg.clientWidth,svg._svg.clientHeight,10);
-		runLayout()
-	})
+	var sx = d3.scale.linear()
+	.domain([d3.min(ft.people,ft.getX), d3.max(ft.people,ft.getX)])
+	.range([0,w])
+	.compose(ft.getX)
+	
+	var circle = svg.selectAll("circle")
+	.data(ft.people)
+	.enter().append("svg:circle")
+	.attr("cx", ssx)
+	.attr("cy", ssy)
+	.attr("r", 12);
+
+	
+	 
+	
 })	
   </script>
 </head>
 <body>
 
-
-<svg width="80%" height="80%"
-	id="box"
-	xmlns="http://www.w3.org/2000/svg" version="1.1" 
->
+<div id='tree'>
+</div>
 
 </svg>
-<form>
-	<textarea cols="50" rows="4" id="graphml">
-graph {
-14 [fill = black, size = 20]
-17 - 14
-18 - 9
-13 - 0
-13 - 5
-18 - 16
-1 - 14
-13 - 9
-nodes [fill = red]
-9 - 12
-0 - 4
-19 - 15
-14 - 14
-14 - 16
-5 - 2
-5 - 4
-2 - 7
-17 - 1
-9 - 12
-4 - 15
-15 - 8
-4 - 2
-}
-
-</textarea>
-
 	
-</form>
-
-<button id="draw">draw</button> 
-<button id="random">random</button> 
 </body>
 </html>
