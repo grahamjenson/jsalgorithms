@@ -131,41 +131,91 @@ $(document).ready(function(){
 	w = 300
 	h = 300
 	people = values(family)
+	//This ensures that parents are all in the same order
+	map(function(d){if(d.parents!= undefined) {d.parents.sort()}},people)
+
+	//we need to assign every parent the == object, so that indexOf works (MEAN HACK)
+	//var couples = filter(function(o) {return o != undefined},unique(map(function(d){return d.parents},people)))
+	//var mapop = {}
+	//for(var pi in couples)
+	//{
+//		mapop[couples[pi]] = couples[pi]
+//	}
+//	map(function(d){if(d.parents != undefined) {d.parents = mapop[d.parents]}},people)
 	
-	var nodes = values(family)
-	nodes =	nodes.concat(
-		filter(function(o) {return o != undefined},
-			unique(map(function(d){return d.parents},nodes)) // add unique parents to the nodes
-			)
-		)
+	//duplicate family for node map
+	nodes =  values(family) // duplicate
+	couples = filter(function(o) {return o != undefined},unique(map(function(d){return d.parents},people)))
+	hypernodemap = {}
+	for(ci in couples)
+	{
+		hypernodemap[couples[ci]] = {}	
+	}
 	
+	hypernodes = values(hypernodemap)
+	
+	allnodes = nodes.concat(hypernodes)
 		
 	//currently hard coded
-	var ll = [{'source' :5 , "target" : 0},{'source' :5 , "target" : 1},{'source' :5 , "target" : 2},{'source' :5 , "target" : 3},{'source' :5 , "target" : 4}]
+	ll = []
+	for(var ni in nodes)
+	{
+		var node = nodes[ni]
+		if(node.parents != undefined)
+		{
+			var o = {}
+			o.source = node
+			o.target  = hypernodemap[node.parents]
+			ll.push(o)
+				
+		}
+			
+	}
 	
+	for(var hi in couples)
+	{
+		var parents = couples[hi]
+		
+		
+		for(var pi in parents)
+		{
+			var noderef = parents[pi]
+			
+			ll.push({"source":  hypernodemap[parents], "target": family[noderef]})
+		}
+	}	
 	
 	var svg = d3.select("#tree").append("svg:svg")
 	.attr("width", w)
 	.attr("height", h);
 
+
+	console.log(ll)
+	
+	
+	
 	 var force = d3.layout.force()
-	.nodes(nodes)
+	.nodes(allnodes)
 	.links(ll)
 	.size([w, h])
 	.start();
+	
+	console.log(2.5)
 	
 	var getX = function(d){return d.x}
 	var getY = function(d){return d.y}
 	var getBD = function(p){return p.birthdate}
 	var sy = d3.scale.linear()
 	.domain([d3.min(people,getBD), d3.max(people,getBD)])
-	.range([0,h])
+	.range([150,h-100])
 	.compose(getBD);
 	
 
+	console.log(2)
+	
 
 	var circle = svg.selectAll("circle")
-	.data(people)
+	.data(nodes)
 	.enter().append("svg:circle")
 	.attr("cx", getX)
 	.attr("cy", getY)
@@ -173,6 +223,9 @@ $(document).ready(function(){
 	 
 	 force.on("tick", function() {
 	 map(function(p){p.y = sy(p)},people)
+	
+	
+	console.log(4)
 	
 	//need to add a functino to swap badly sorted nodes (e.g. to order kids from left to right in order of age
   	circle.attr("cx", function(d) { return d.x; })
